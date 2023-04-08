@@ -1,0 +1,72 @@
+- name: Install Python 3.11 on the host
+  hosts: webservers
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: Update package repository
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      apt:
+        name:
+          - build-essential
+          - zlib1g-dev
+          - libncurses5-dev
+          - libgdbm-dev
+          - libnss3-dev
+          - libssl-dev
+          - libsqlite3-dev
+          - libreadline-dev
+          - libffi-dev
+          - libbz2-dev
+          - wget
+          - curl
+          - git
+          - vim
+        state: present
+
+    - name: Download Python 3.11 source
+      get_url:
+        url: "https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz"
+        dest: "/tmp/Python-3.11.0.tgz"
+
+    - name: Extract Python 3.11 source
+      unarchive:
+        src: "/tmp/Python-3.11.0.tgz"
+        dest: "/tmp"
+        remote_src: yes
+
+    - name: Build and install Python 3.11
+      shell: |
+        cd /tmp/Python-3.11.0
+        ./configure --enable-optimizations
+        make -j $(nproc)
+        make altinstall
+      args:
+        creates: /usr/local/bin/python3.11
+      register: build_output
+      changed_when: false
+      async: 1800 # Maximum duration for the task in seconds (30 minutes)
+      poll: 5 # Check the status every 5 seconds
+
+    - name: Check Python 3.11 version
+      command: python3.11 --version
+      register: python_version
+      changed_when: false
+
+    - name: Create a symbolic link for 'python' to point to Python 3.11
+      command: update-alternatives --install /usr/bin/python python /usr/local/bin/python3.11 1
+      become: yes
+
+    - name: Install tmux
+      apt:
+        name: tmux
+        state: present
+
+    - name: Check tmux version
+      command: tmux -V
+      register: tmux_version
+      changed_when: false
