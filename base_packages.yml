@@ -1,0 +1,34 @@
+- name: Install base elements
+  hosts: webservers
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: Update package repository
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      apt:
+        name:
+          - build-essential
+          - zlib1g-dev
+          - libncurses5-dev
+          - libgdbm-dev
+          - libnss3-dev
+          - libssl-dev
+          - libsqlite3-dev
+          - libreadline-dev
+          - libffi-dev
+          - libbz2-dev
+          - wget
+          - curl
+          - git
+          - vim
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+        state: present
