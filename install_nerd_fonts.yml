@@ -1,0 +1,35 @@
+- name: Install JetBrainsMono Nerd Fonts
+  hosts: all
+  become: yes
+  gather_facts: yes
+  vars:
+    nerd_fonts_version: "2.3.3"
+    nerd_fonts_url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ nerd_fonts_version }}/JetBrainsMono.zip"
+    nerd_fonts_install_directory: "/usr/local/share/fonts"
+
+  tasks:
+    - name: Create Nerd Fonts installation directory
+      file:
+        path: "{{ nerd_fonts_install_directory }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Download JetBrainsMono Nerd Fonts
+      get_url:
+        url: "{{ nerd_fonts_url }}"
+        dest: "/tmp/JetBrainsMono-nerd-fonts.zip"
+        mode: 0644
+
+    - name: Unzip JetBrainsMono Nerd Fonts archive
+      unarchive:
+        src: "/tmp/JetBrainsMono-nerd-fonts.zip"
+        dest: "{{ nerd_fonts_install_directory }}"
+        remote_src: yes
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Rebuild font cache
+      command: fc-cache -f -v

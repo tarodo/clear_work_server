@@ -1,0 +1,47 @@
+- name: Remove .config/nvim
+  file:
+    path: "/home/{{ current_user.username }}/.config/nvim"
+    state: absent
+
+- name: Remove .local/share/nvim
+  file:
+    path: "/home/{{ current_user.username }}/.local/share/nvim"
+    state: absent
+
+- name: Remove .local/state/nvim
+  file:
+    path: "/home/{{ current_user.username }}/.local/state/nvim"
+    state: absent
+
+- name: Remove .cache/nvim
+  file:
+    path: "/home/{{ current_user.username }}/.cache/nvim"
+    state: absent
+
+- name: Download AstroNvim
+  ansible.builtin.git:
+    repo: 'https://github.com/AstroNvim/AstroNvim'
+    dest: "/home/{{ current_user.username }}/.config/nvim"
+    update: yes
+  become: yes
+  become_user: "{{ current_user.username }}"
+
+- name: Clone Oh My Zsh repository
+  git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "~/.oh-my-zsh"
+    version: master
+    update: yes
+  become_user: "{{ current_user.username }}"
+  notify: Change shell
+
+- name: Create .zshrc file
+  template:
+    src: "files/{{ current_user.username }}_zshrc.j2"
+    dest: "~/.zshrc"
+    owner: "{{ current_user.username }}"
+    mode: 0644
+  become_user: "{{ current_user.username }}"
+
+- name: Change shell
+  command: chsh -s /usr/bin/zsh "{{ current_user.username }}"
