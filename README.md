@@ -14,7 +14,9 @@
         email: "myuser@email.com"
    ```
 3. Add public key for new users into `files/` with name like `myuser_key.pub`
-4. Don't forget about fonts on your host
+4. Add tmux config for new users into `files/` with name like `myuser_tmux.conf`
+5. Add oh-my-zsh conf for new users into `files/` with name like `myuser_zshrc.j2`
+6. Don't forget about fonts on your host
    1. Windows:
       - Download JetBrainsMono Nerd Font from here.
       - Extract into a folder
