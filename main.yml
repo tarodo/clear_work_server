@@ -10,3 +10,4 @@
 - import_playbook: create_user_accounts.yml
 - import_playbook: install_nerd_fonts.yml
 - import_playbook: install_astronvim.yml
+- import_playbook: install_zsh.yml

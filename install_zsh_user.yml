@@ -1,0 +1,39 @@
+- name: Clone Oh My Zsh repository
+  git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "~/.oh-my-zsh"
+    version: master
+    update: yes
+  become_user: "{{ current_user.username }}"
+
+- name: Create .zshrc file
+  template:
+    src: "files/{{ current_user.username }}_zshrc.j2"
+    dest: "~/.zshrc"
+    owner: "{{ current_user.username }}"
+    mode: 0644
+  become_user: "{{ current_user.username }}"
+
+- name: Install fzf-zsh-plugin
+  git:
+    repo: https://github.com/unixorn/fzf-zsh-plugin.git
+    dest: "~/.oh-my-zsh/custom/plugins/fzf-zsh-plugin"
+    update: yes
+  become_user: "{{ current_user.username }}"
+
+- name: Install zsh-z
+  git:
+    repo: https://github.com/agkozak/zsh-z.git
+    dest: "~/.oh-my-zsh/custom/plugins/zsh-z"
+    update: yes
+  become_user: "{{ current_user.username }}"
+
+- name: Install zsh-syntax-highlighting
+  git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+    dest: "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+    update: yes
+  become_user: "{{ current_user.username }}"
+
+- name: Change shell
+  command: chsh -s /usr/bin/zsh "{{ current_user.username }}"
