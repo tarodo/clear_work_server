@@ -7,4 +7,10 @@ plugins=(
   zsh-syntax-highlighting
 )
 
+# Start TMUX with SSH connection
+if [ -z "$TMUX" ] && [ "$SSH_CONNECTION" != "" ]; then
+  tmux attach || tmux new-session
+  exit
+fi
+
 source ~/.oh-my-zsh/oh-my-zsh.sh

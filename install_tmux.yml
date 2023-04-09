@@ -2,6 +2,8 @@
   hosts: webservers
   become: yes
   gather_facts: no
+  vars_files:
+    - vars.yml
 
   tasks:
     - name: Install tmux
@@ -13,3 +15,21 @@
       command: tmux -V
       register: tmux_version
       changed_when: false
+
+    - name: Install Tmux Plugin Manager (tpm)
+      git:
+        repo: https://github.com/tmux-plugins/tpm
+        dest: ~/.tmux/plugins/tpm
+        depth: 1
+        force: yes
+      become_user: "{{ item.username }}"
+      with_items: "{{ users }}"
+
+    - name: Clone tmux config
+      template:
+        src: "files/{{ item.username }}_tmux.conf"
+        dest: "~/.tmux.conf"
+        owner: "{{ item.username }}"
+        mode: 0644
+      become_user: "{{ item.username }}"
+      with_items: "{{ users }}"
