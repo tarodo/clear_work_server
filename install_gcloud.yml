@@ -1,0 +1,36 @@
+---
+- name: Install and configure Google Cloud SDK
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  vars:
+    gcloud_sdk_version: "427.0.0"
+    gcloud_sdk_install_path: "/opt/google-cloud-sdk"
+
+  tasks:
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Create gcloud directory
+      file:
+        path: "{{ gcloud_sdk_install_path }}"
+        state: directory
+
+    - name: Download and install Google Cloud SDK
+      ansible.builtin.unarchive:
+        src: "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-{{ gcloud_sdk_version }}-linux-x86_64.tar.gz"
+        dest: "{{ gcloud_sdk_install_path }}"
+        remote_src: yes
+        creates: "{{ gcloud_sdk_install_path }}/google-cloud-sdk/bin/gcloud"
+
+    - name: Run install.sh script for Google Cloud SDK
+      ansible.builtin.command:
+        cmd: "./install.sh --quiet"
+        chdir: "{{ gcloud_sdk_install_path }}/google-cloud-sdk"
+        creates: "{{ gcloud_sdk_install_path }}/google-cloud-sdk/path.bash.inc"
