@@ -1,38 +1,39 @@
-- name: Install Python 3.11
+- name: Install Python 3.12
   hosts: webservers
   become: yes
   gather_facts: no
 
-  tasks:
-    - name: Download Python 3.11 source
-      get_url:
-        url: "https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz"
-        dest: "/tmp/Python-3.11.0.tgz"
+  vars:
+    python_versions:
+      - { version: "3.10.13", custom_path: "/opt/python3.10", config_flag: "--enable-optimizations --with-ensurepip=upgrade" }
+      - { version: "3.11.7", custom_path: "/opt/python3.11", config_flag: "--enable-optimizations --with-ensurepip=upgrade" }
+      - { version: "3.12.1", custom_path: "/opt/python3.12", config_flag: "--enable-optimizations --with-ensurepip=upgrade" }
 
-    - name: Extract Python 3.11 source
+  tasks:
+    - name: Download Python
+      get_url:
+        url: "https://www.python.org/ftp/python/{{ item.version }}/Python-{{ item.version }}.tgz"
+        dest: "/tmp/Python-{{ item.version }}.tgz"
+      loop: "{{ python_versions }}"
+
+    - name: Extract Python source
       unarchive:
-        src: "/tmp/Python-3.11.0.tgz"
+        src: "/tmp/Python-{{ item.version }}.tgz"
         dest: "/tmp"
         remote_src: yes
+      loop: "{{ python_versions }}"
 
-    - name: Build and install Python 3.11
+    - name: Build and install Python
       shell: |
-        cd /tmp/Python-3.11.0
-        ./configure --enable-optimizations
-        make -j $(nproc)
+        ./configure {{ item.config_flag }} --prefix={{ item.custom_path }} &&
+        make -j $(nproc) &&
         make altinstall
       args:
-        creates: /usr/local/bin/python3.11
-      register: build_output
-      changed_when: false
-      async: 1800 # Maximum duration for the task in seconds (30 minutes)
-      poll: 5 # Check the status every 5 seconds
+        chdir: "/tmp/Python-{{ item.version }}"
+        creates: "{{ item.custom_path }}"
+      async: 1800
+      poll: 5
+      loop: "{{ python_versions }}"
 
-    - name: Check Python 3.11 version
-      command: python3.11 --version
-      register: python_version
-      changed_when: false
-
-    - name: Create a symbolic link for 'python' to point to Python 3.11
-      command: update-alternatives --install /usr/bin/python python /usr/local/bin/python3.11 1
-      become: yes
+    - name: Create a symbolic link for 'python'
+      command: "update-alternatives --install /usr/bin/python python {{ python_versions[-1].custom_path }} 1"
