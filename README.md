@@ -34,3 +34,8 @@ Use shell:
 ```shell
 ansible-playbook -i inventory.ini main.yml -u root
 ```
+
+## Syncthing link
+```shell
+ssh -L 8385:localhost:8384 user@remote-server
+```
