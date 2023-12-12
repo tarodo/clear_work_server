@@ -4,10 +4,9 @@
   gather_facts: yes
 
 - import_playbook: base_packages.yml
-- import_playbook: install_python.yml
+- import_playbook: install_docker.yml
 - import_playbook: create_user_accounts.yml
 - import_playbook: install_tmux.yml
-- import_playbook: install_docker.yml
 - import_playbook: install_nerd_fonts.yml
 - import_playbook: install_astronvim.yml
 - import_playbook: install_zsh.yml
