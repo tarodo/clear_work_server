@@ -35,4 +35,5 @@
           - unzip
           - fontconfig
           - zsh
+          - xclip
         state: present
