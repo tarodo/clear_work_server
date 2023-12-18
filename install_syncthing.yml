@@ -1,25 +1,31 @@
 - name: Setup Syncthing for User Roman
   hosts: webservers
   become: yes
-  become_user: roman
+  gather_facts: no
+
+  vars_files:
+    - vars.yml
+
   tasks:
     - name: Create a directory in user's home
       file:
-        path: "/home/roman/sharing_data"
+        path: "/home/{{ item.username }}/sharing_data"
         state: directory
-        owner: roman
-        group: roman
+        owner: "{{ item.username }}"
         mode: '0755'
+      loop: "{{ users }}"
 
     - name: Copy docker-compose file to remote
       copy:
         src: syncthing/docker-compose.yml
-        dest: /home/roman/docker-compose.yml
-        owner: roman
-        group: roman
+        dest: "/home/{{ item.username }}/docker-compose.yml"
+        owner: "{{ item.username }}"
         mode: '0644'
+      loop: "{{ users }}"
 
     - name: Run docker-compose up
+      become_user: "{{ item.username }}"
       command: docker-compose up -d
       args:
-        chdir: /home/roman/sharing_data
+        chdir: "/home/{{ item.username }}/sharing_data"
+      loop: "{{ users }}"
