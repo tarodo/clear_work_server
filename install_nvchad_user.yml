@@ -1,0 +1,28 @@
+- name: Remove .config/nvim
+  file:
+    path: "/home/{{ current_user.username }}/.config/nvim"
+    state: absent
+
+- name: Remove .local/share/nvim
+  file:
+    path: "/home/{{ current_user.username }}/.local/share/nvim"
+    state: absent
+
+- name: Remove .local/state/nvim
+  file:
+    path: "/home/{{ current_user.username }}/.local/state/nvim"
+    state: absent
+
+- name: Remove .cache/nvim
+  file:
+    path: "/home/{{ current_user.username }}/.cache/nvim"
+    state: absent
+
+- name: Download NvChad
+  ansible.builtin.git:
+    repo: 'https://github.com/NvChad/starter'
+    dest: "/home/{{ current_user.username }}/.config/nvim"
+    update: yes
+  become: yes
+  become_user: "{{ current_user.username }}"
+

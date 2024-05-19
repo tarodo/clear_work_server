@@ -33,3 +33,4 @@
 
     - name: Rebuild font cache
       command: fc-cache -f -v
+

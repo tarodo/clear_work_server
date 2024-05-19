@@ -7,37 +7,41 @@
     - vars.yml
 
   tasks:
-    - name: "Create user accounts"
-      user:
-        name: "{{ item.username }}"
-        groups: "{{ item.groups }}"
-        state: "present"
-      with_items: "{{ users }}"
+    - name: Create user accounts and configure SSH
+      block:
+        - name: "Create user accounts"
+          user:
+            name: "{{ item.username }}"
+            groups: "{{ item.groups }}"
+            state: "present"
+          with_items: "{{ users }}"
 
-    - name: "Add authorized keys"
-      authorized_key:
-        user: "{{ item.username }}"
-        key: "{{ lookup('file', 'files/'+ item.username + '_key.pub') }}"
-      with_items: "{{ users }}"
+        - name: "Add authorized keys"
+          authorized_key:
+            user: "{{ item.username }}"
+            key: "{{ lookup('file', 'files/' + item.username + '_key.pub') }}"
+          with_items: "{{ users }}"
 
-    - name: "Allow admin users to sudo without a password"
-      lineinfile:
-        dest: "/etc/sudoers"
-        state: "present"
-        regexp: "^%admin"
-        line: "%admin ALL=(ALL) NOPASSWD: ALL"
+        - name: "Allow admin users to sudo without a password"
+          lineinfile:
+            dest: "/etc/sudoers"
+            state: "present"
+            regexp: "^%admin"
+            line: "%admin ALL=(ALL) NOPASSWD: ALL"
 
-#    - name: Disable root SSH login
-#      lineinfile:
-#        dest: /etc/ssh/sshd_config
-#        regexp: '^PermitRootLogin'
-#        line: 'PermitRootLogin no'
-#        state: present
-#      notify:
-#        - Restart sshd
+    # Uncomment and modify if needed
+    # - name: Disable root SSH login
+    #   lineinfile:
+    #     dest: /etc/ssh/sshd_config
+    #     regexp: '^PermitRootLogin'
+    #     line: 'PermitRootLogin no'
+    #     state: present
+    #   notify:
+    #     - Restart sshd
 
   handlers:
     - name: Restart sshd
       systemd:
         name: ssh
-        state: restarted
+       
+

@@ -16,20 +16,35 @@
       register: tmux_version
       changed_when: false
 
+    - name: Display tmux version
+      debug:
+        var: tmux_version.stdout_lines
+
+    - name: Ensure tmux plugin directory exists
+      file:
+        path: "/home/{{ item.username }}/.tmux/plugins"
+        state: directory
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: '0755'
+      with_items: "{{ users }}"
+
     - name: Install Tmux Plugin Manager (tpm)
       git:
         repo: https://github.com/tmux-plugins/tpm
-        dest: ~/.tmux/plugins/tpm
+        dest: "/home/{{ item.username }}/.tmux/plugins/tpm"
         depth: 1
         force: yes
+      become: yes
       become_user: "{{ item.username }}"
       with_items: "{{ users }}"
 
     - name: Clone tmux config
       template:
         src: "files/{{ item.username }}_tmux.conf"
-        dest: "~/.tmux.conf"
+        dest: "/home/{{ item.username }}/.tmux.conf"
         owner: "{{ item.username }}"
-        mode: 0644
-      become_user: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: '0644'
       with_items: "{{ users }}"
+

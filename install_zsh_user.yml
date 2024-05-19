@@ -35,5 +35,11 @@
     update: yes
   become_user: "{{ current_user.username }}"
 
+- name: Clone zsh-autosuggestions repository
+  git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+    update: yes
+
 - name: Change shell
   command: chsh -s /usr/bin/zsh "{{ current_user.username }}"

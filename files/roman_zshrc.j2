@@ -1,11 +1,14 @@
-ZSH_THEME="robbyrussell"
+ZSH_THEME="minimal"
 
 plugins=(
   fzf-zsh-plugin
   git
-  zsh-z
+  z
+  docker-compose
+  docker
   zsh-syntax-highlighting
 )
+
 
 # Start TMUX with SSH connection
 if [ -z "$TMUX" ] && [ "$SSH_CONNECTION" != "" ]; then
@@ -13,4 +16,8 @@ if [ -z "$TMUX" ] && [ "$SSH_CONNECTION" != "" ]; then
   exit
 fi
 
+alias clock='tty-clock -c -C 7 -D'
+
 source ~/.oh-my-zsh/oh-my-zsh.sh
+source ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+

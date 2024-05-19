@@ -22,8 +22,9 @@
         name: "neovim"
         state: present
 
-    - name: install astronvim for each user
-      include_tasks: install_astronvim_user.yml
+    - name: install nvchad for each user
+      include_tasks: install_nvchad_user.yml
       loop: "{{ users }}"
       loop_control:
         loop_var: current_user
+
